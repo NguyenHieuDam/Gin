@@ -41,7 +41,10 @@ func CreateTask(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
+	if task.Status != "pending" && task.Status != "in-progress" && task.Status != "completed" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Trạng thái không hợp lệ"})
+		return
+	}
 	config.DB.Create(&task)
 	response := TaskResponse{
 		ID:          task.ID,
