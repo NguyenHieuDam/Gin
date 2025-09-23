@@ -121,8 +121,8 @@ func (c *Client) readPump() {
 		switch wsMessage.Type {
 		case "message":
 			c.handleMessage(&wsMessage)
-		case "typing":
-			c.handleTyping(&wsMessage)
+        case "typing":
+            c.handleTyping()
 		case "ping":
 			c.handlePing()
 		default:
@@ -193,7 +193,7 @@ func (c *Client) handleMessage(wsMessage *models.WebSocketMessage) {
 }
 
 // handleTyping processes typing indicators
-func (c *Client) handleTyping(wsMessage *models.WebSocketMessage) {
+func (c *Client) handleTyping() {
 	// Broadcast typing indicator to room members
 	c.hub.broadcast <- &BroadcastMessage{
 		Message: &models.Message{
@@ -221,13 +221,10 @@ func (c *Client) pingPong() {
 	ticker := time.NewTicker(30 * time.Second)
 	defer ticker.Stop()
 
-	for {
-		select {
-		case <-ticker.C:
-			if time.Since(c.lastPing) > 90*time.Second {
-				c.conn.Close()
-				return
-			}
+	for range ticker.C {
+		if time.Since(c.lastPing) > 90*time.Second {
+			c.conn.Close()
+			return
 		}
 	}
 }

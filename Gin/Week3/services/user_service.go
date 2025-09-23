@@ -63,12 +63,17 @@ func (s *UserService) Login(req *models.LoginRequest) (*models.UserResponse, err
 		return nil, errors.New("tên đăng nhập hoặc mật khẩu không đúng")
 	}
 
-	// Update last seen
-	s.db.Model(&user).Updates(map[string]interface{}{
-		"last_seen": time.Now(),
-	})
+    // Update online status and last seen
+    now := time.Now()
+    s.db.Model(&user).Updates(map[string]interface{}{
+        "is_online": true,
+        "last_seen": now,
+    })
 
-	response := user.ToResponse()
+    // Reflect updates in the returned response
+    user.IsOnline = true
+    user.LastSeen = now
+    response := user.ToResponse()
 	return &response, nil
 }
 

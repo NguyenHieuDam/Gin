@@ -82,7 +82,7 @@ func (rl *RateLimiter) RateLimitMiddleware(config RateLimitConfig) gin.HandlerFu
 		
 		// Increment counter
 		pipe := rl.redis.Pipeline()
-		incr := pipe.Incr(rl.ctx, key)
+		pipe.Incr(rl.ctx, key)
 		pipe.Expire(rl.ctx, key, config.Window)
 		_, err = pipe.Exec(rl.ctx)
 		

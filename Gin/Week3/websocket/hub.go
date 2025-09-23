@@ -18,9 +18,9 @@ type BroadcastMessage struct {
 // Hub quản lý tất cả client đang kết nối
 type Hub struct {
 	// Map of room ID to clients in that room
-	rooms    map[string]map[*Client]bool
+	rooms map[string]map[*Client]bool
 	// All clients regardless of room
-	clients  map[*Client]bool
+	clients map[*Client]bool
 	// Channel for registering clients
 	register chan *Client
 	// Channel for unregistering clients
@@ -57,7 +57,7 @@ func (h *Hub) Run() {
 // registerClient adds a client to the hub and appropriate room
 func (h *Hub) registerClient(client *Client) {
 	h.clients[client] = true
-	
+
 	// Add to room
 	if h.rooms[client.roomID] == nil {
 		h.rooms[client.roomID] = make(map[*Client]bool)
@@ -75,7 +75,7 @@ func (h *Hub) unregisterClient(client *Client) {
 	if _, ok := h.clients[client]; ok {
 		delete(h.clients, client)
 		close(client.send)
-		
+
 		// Remove from room
 		if room, exists := h.rooms[client.roomID]; exists {
 			delete(room, client)
@@ -99,7 +99,7 @@ func (h *Hub) broadcastMessage(msg *BroadcastMessage) {
 	}
 
 	var wsMessage models.WebSocketMessage
-	
+
 	switch msg.Type {
 	case "message":
 		wsMessage = models.WebSocketMessage{

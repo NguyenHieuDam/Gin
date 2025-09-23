@@ -152,7 +152,7 @@ GET /api/v1/ws/?user_id=1&username=john_doe&room_id=general
 
 #### Lấy danh sách người trực tuyến
 ```http
-GET /api/v1/ws/{roomId}/users
+GET /api/v1/ws/general/users
 ```
 
 ### Health Check

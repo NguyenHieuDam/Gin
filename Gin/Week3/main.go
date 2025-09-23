@@ -6,10 +6,11 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/gin-gonic/gin"
 	"WEEK3/db"
 	"WEEK3/handlers"
 	"WEEK3/middleware"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -20,7 +21,7 @@ func main() {
 
 	// Initialize databases
 	log.Println("🚀 Starting Chat Application...")
-	
+
 	// Connect to PostgreSQL
 	postgresDB, err := db.ConnectPostgres()
 	if err != nil {
@@ -61,10 +62,10 @@ func main() {
 	r.Use(rateLimiter.RateLimitMiddleware(middleware.DefaultRateLimitConfig()))
 
 	// Add specific rate limiting to sensitive routes
-	authRateLimit := rateLimiter.LoginRateLimitMiddleware()
-	registerRateLimit := rateLimiter.RegisterRateLimitMiddleware()
-	messageRateLimit := rateLimiter.MessageRateLimitMiddleware()
-	wsRateLimit := rateLimiter.WebSocketRateLimitMiddleware()
+	rateLimiter.LoginRateLimitMiddleware()
+	rateLimiter.RegisterRateLimitMiddleware()
+	rateLimiter.MessageRateLimitMiddleware()
+	rateLimiter.WebSocketRateLimitMiddleware()
 
 	// Setup all routes first
 	handler.SetupRoutes(r)

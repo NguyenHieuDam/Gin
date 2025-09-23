@@ -3,9 +3,10 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	"WEEK3/services"
 	"WEEK3/websocket"
+
+	"github.com/gin-gonic/gin"
 )
 
 type WSHandler struct {
@@ -60,7 +61,7 @@ func (h *WSHandler) GetOnlineUsers(c *gin.Context) {
 // GetRooms returns all available rooms
 func (h *WSHandler) GetRooms(c *gin.Context) {
 	rooms := h.hub.GetAllRooms()
-	
+
 	// Add default room if not exists
 	hasGeneral := false
 	for _, room := range rooms {
@@ -94,8 +95,8 @@ func (h *WSHandler) GetRoomStats(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"room_id":       roomID,
-		"online_users":  count,
-		"total_rooms":   len(h.hub.GetAllRooms()),
+		"room_id":      roomID,
+		"online_users": count,
+		"total_rooms":  len(h.hub.GetAllRooms()),
 	})
 }

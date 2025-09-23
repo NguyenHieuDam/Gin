@@ -3,9 +3,10 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	"WEEK3/models"
 	"WEEK3/services"
+
+	"github.com/gin-gonic/gin"
 )
 
 type AuthHandler struct {

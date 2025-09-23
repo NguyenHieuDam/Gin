@@ -3,11 +3,11 @@ package services
 import (
 	"encoding/json"
 	"errors"
-	"time"
+
+	"WEEK3/models"
 
 	"github.com/go-redis/redis/v8"
 	"gorm.io/gorm"
-	"WEEK3/models"
 )
 
 type MessageService struct {
@@ -49,7 +49,7 @@ func (s *MessageService) SendMessage(userID uint, username, content, roomID stri
 func (s *MessageService) GetMessages(roomID string, limit, offset int) ([]models.MessageResponse, error) {
 	var messages []models.Message
 	query := s.db.Where("room_id = ?", roomID).Order("created_at DESC")
-	
+
 	if limit > 0 {
 		query = query.Limit(limit)
 	}
@@ -117,11 +117,11 @@ func (s *MessageService) DeleteMessage(id, userID uint) error {
 func (s *MessageService) saveMessageToRedis(message *models.Message) {
 	ctx := s.redis.Context()
 	key := "messages:" + message.RoomID
-	
+
 	// Add to sorted set with timestamp as score
 	score := float64(message.CreatedAt.Unix())
 	member, _ := json.Marshal(message.ToResponse())
-	
+
 	s.redis.ZAdd(ctx, key, &redis.Z{
 		Score:  score,
 		Member: member,
@@ -157,7 +157,7 @@ func (s *MessageService) getMessagesFromRedis(roomID string, limit int) ([]model
 func (s *MessageService) removeMessageFromRedis(messageID uint, roomID string) {
 	ctx := s.redis.Context()
 	key := "messages:" + roomID
-	
+
 	// Get all messages to find and remove the specific one
 	members, err := s.redis.ZRange(ctx, key, 0, -1).Result()
 	if err != nil {
@@ -179,7 +179,7 @@ func (s *MessageService) removeMessageFromRedis(messageID uint, roomID string) {
 func (s *MessageService) SearchMessages(roomID, query string, limit int) ([]models.MessageResponse, error) {
 	var messages []models.Message
 	err := s.db.Where("room_id = ? AND content ILIKE ?", roomID, "%"+query+"%").Order("created_at DESC").Limit(limit).Find(&messages).Error
-	
+
 	if err != nil {
 		return nil, errors.New("lỗi khi tìm kiếm tin nhắn")
 	}
