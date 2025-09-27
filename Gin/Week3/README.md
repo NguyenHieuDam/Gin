@@ -1,43 +1,45 @@
-# Chat App - Ứng dụng Trò chuyện Thời gian thực
+# Ứng dụng Chat Real-time với Gin Golang
 
-Ứng dụng chat thời gian thực được xây dựng bằng Go, sử dụng WebSocket, PostgreSQL và Redis.
+Ứng dụng trò chuyện thời gian thực được phát triển bằng Gin Golang theo mô hình MVC.
 
-## 🚀 Tính năng
+## Tính năng
 
-- ✅ **Trò chuyện thời gian thực** - Gửi và nhận tin nhắn ngay lập tức
-- ✅ **WebSocket** - Giao tiếp hai chiều nhanh chóng
-- ✅ **Theo dõi trạng thái hiện diện** - Hiển thị người dùng trực tuyến
-- ✅ **Lưu trữ lịch sử tin nhắn** - Với Redis cho truy cập nhanh
-- ✅ **Giới hạn tốc độ (Rate Limiting)** - Ngăn chặn spam
-- ✅ **Giao diện web hiện đại** - Responsive và thân thiện với người dùng
-- ✅ **Quản lý phòng trò chuyện** - Hỗ trợ nhiều phòng
-- ✅ **Tìm kiếm tin nhắn** - Tìm kiếm trong lịch sử
-- ✅ **Typing indicators** - Hiển thị ai đang gõ
+- ✅ **Trò chuyện thời gian thực**: Người dùng có thể gửi và nhận tin nhắn theo thời gian thực
+- ✅ **WebSockets**: Giao tiếp hai chiều nhanh chóng
+- ✅ **Theo dõi sự hiện diện**: Hiển thị người dùng trực tuyến
+- ✅ **Lưu trữ lịch sử tin nhắn**: Sử dụng Redis để lưu trữ tin nhắn
+- ✅ **Giới hạn tốc độ**: Rate limiting để ngăn chặn spam
+- ✅ **Giao diện đẹp**: UI hiện đại với Bootstrap và Vue.js
 
-## 🛠️ Công nghệ sử dụng
+## Cấu trúc dự án
 
-### Backend
-- **Go 1.21+** - Ngôn ngữ lập trình chính
-- **Gin** - Web framework
-- **GORM** - ORM cho database
-- **PostgreSQL** - Database chính
-- **Redis** - Cache và real-time data
-- **Gorilla WebSocket** - WebSocket implementation
+```
+chat-app/
+├── controllers/          # Controllers xử lý logic
+│   ├── auth_controller.go
+│   ├── message_controller.go
+│   └── websocket_controller.go
+├── models/              # Models định nghĩa cấu trúc dữ liệu
+│   ├── user.go
+│   ├── message.go
+│   └── websocket.go
+├── middleware/          # Middleware
+│   └── rate_limiter.go
+├── services/           # Services
+│   └── redis_service.go
+├── templates/          # HTML templates
+│   └── index.html
+├── main.go            # Entry point
+├── go.mod            # Go modules
+└── README.md         # Documentation
+```
 
-### Frontend
-- **HTML5/CSS3** - Giao diện người dùng
-- **Vanilla JavaScript** - Logic frontend
-- **Font Awesome** - Icons
-- **Responsive Design** - Tương thích mobile
+## Yêu cầu hệ thống
 
-## 📋 Yêu cầu hệ thống
+- Go 1.21+
+- Redis (tùy chọn, ứng dụng vẫn hoạt động nếu không có Redis)
 
-- Go 1.21 hoặc cao hơn
-- PostgreSQL 12+
-- Redis 6+
-- Modern web browser
-
-## 🔧 Cài đặt và Chạy
+## Cài đặt và chạy
 
 ### 1. Clone repository
 ```bash
@@ -50,318 +52,141 @@ cd chat-app
 go mod tidy
 ```
 
-### 3. Cài đặt và cấu hình Database
-
-#### PostgreSQL
-```sql
--- Tạo database
-CREATE DATABASE chatapp;
-
--- Tạo user (optional)
-CREATE USER chatapp_user WITH PASSWORD 'your_password';
-GRANT ALL PRIVILEGES ON DATABASE chatapp TO chatapp_user;
-```
-
-#### Redis
+### 3. Cài đặt Redis (tùy chọn)
 ```bash
-# Cài đặt Redis (Ubuntu/Debian)
-sudo apt update
-sudo apt install redis-server
+# Ubuntu/Debian
+sudo apt-get install redis-server
 
-# Khởi động Redis
-sudo systemctl start redis-server
-sudo systemctl enable redis-server
+# macOS
+brew install redis
+
+# Windows
+# Tải Redis từ https://redis.io/download
 ```
 
-### 4. Cấu hình Environment Variables
-
-Tạo file `.env` hoặc set environment variables:
-
-```bash
-# Database
-export DB_HOST=localhost
-export DB_PORT=5432
-export DB_USER=postgres
-export DB_PASSWORD=123456
-export DB_NAME=chatapp
-export DB_SSLMODE=disable
-
-# Redis
-export REDIS_HOST=localhost
-export REDIS_PORT=6379
-export REDIS_PASSWORD=
-export REDIS_DB=0
-
-# Server
-export PORT=8080
-export GIN_MODE=debug
-```
-
-### 5. Chạy ứng dụng
+### 4. Chạy ứng dụng
 ```bash
 go run main.go
 ```
 
-Ứng dụng sẽ chạy tại: `http://localhost:8080`
+Ứng dụng sẽ chạy trên `http://localhost:8080`
 
-## 📖 API Documentation
+## Cấu hình môi trường
 
-### Authentication Endpoints
+Bạn có thể cấu hình các biến môi trường sau:
 
-#### Đăng ký
-```http
-POST /api/v1/auth/register
-Content-Type: application/json
-
-{
-  "username": "john_doe",
-  "email": "john@example.com",
-  "password": "password123"
-}
+```bash
+export PORT=8080                    # Port server (mặc định: 8080)
+export REDIS_ADDR=localhost:6379    # Redis address (mặc định: localhost:6379)
+export REDIS_PASSWORD=              # Redis password (mặc định: rỗng)
 ```
 
-#### Đăng nhập
-```http
-POST /api/v1/auth/login
-Content-Type: application/json
+## API Endpoints
 
-{
-  "username": "john_doe",
-  "password": "password123"
-}
+### Authentication
+- `POST /api/auth/login` - Đăng nhập
+- `GET /api/auth/user` - Lấy thông tin user
+- `GET /api/auth/users` - Lấy danh sách users
+
+### Messages
+- `POST /api/messages` - Gửi tin nhắn
+- `GET /api/messages` - Lấy lịch sử tin nhắn
+- `GET /api/messages/online` - Lấy danh sách users trực tuyến
+
+### WebSocket
+- `GET /ws?token=<token>` - Kết nối WebSocket
+
+## Rate Limiting
+
+Ứng dụng có các giới hạn tốc độ sau:
+
+- **Message sending**: 10 tin nhắn/phút
+- **WebSocket connections**: 60 kết nối/phút
+- **General API**: 5 requests/phút
+
+## WebSocket Message Types
+
+- `message` - Tin nhắn chat
+- `user_joined` - User tham gia
+- `user_left` - User rời khỏi
+- `typing` - Đang nhập
+- `stop_typing` - Dừng nhập
+- `ping/pong` - Heartbeat
+
+## Tính năng nâng cao
+
+### Typing Indicators
+Ứng dụng hiển thị khi ai đó đang nhập tin nhắn.
+
+### Online Users
+Hiển thị danh sách người dùng đang trực tuyến.
+
+### Message History
+Lưu trữ lịch sử tin nhắn trong Redis với TTL 24 giờ.
+
+### Auto-reconnection
+WebSocket tự động kết nối lại khi mất kết nối.
+
+## Phát triển
+
+### Thêm tính năng mới
+
+1. **Models**: Định nghĩa cấu trúc dữ liệu trong `models/`
+2. **Controllers**: Xử lý logic trong `controllers/`
+3. **Services**: Logic nghiệp vụ trong `services/`
+4. **Middleware**: Middleware tùy chỉnh trong `middleware/`
+
+### Testing
+
+```bash
+# Chạy tests
+go test ./...
+
+# Test với coverage
+go test -cover ./...
 ```
 
-### Message Endpoints
+## Production Deployment
 
-#### Lấy tin nhắn gần đây
-```http
-GET /api/v1/messages/{roomId}/recent?limit=20
-```
-
-#### Tìm kiếm tin nhắn
-```http
-GET /api/v1/messages/{roomId}/search?q=keyword&limit=20
-```
-
-### WebSocket Endpoints
-
-#### Kết nối WebSocket
-```http
-GET /api/v1/ws/?user_id=1&username=john_doe&room_id=general
-```
-
-#### Lấy danh sách người trực tuyến
-```http
-GET /api/v1/ws/general/users
-```
-
-### Health Check
-```http
-GET /health
-```
-
-## 🔌 WebSocket Message Format
-
-### Gửi tin nhắn
-```json
-{
-  "type": "message",
-  "data": {
-    "content": "Xin chào mọi người!",
-    "room_id": "general"
-  }
-}
-```
-
-### Typing indicator
-```json
-{
-  "type": "typing"
-}
-```
-
-### Ping/Pong
-```json
-{
-  "type": "ping"
-}
-```
-
-## 📁 Cấu trúc Project
-
-```
-chat-app/
-├── main.go                 # Entry point
-├── config.go              # Configuration
-├── go.mod                 # Go modules
-├── go.sum                 # Go modules checksum
-├── README.md              # Documentation
-├── db/                    # Database connections
-│   ├── postgres.go        # PostgreSQL connection
-│   └── redis.go           # Redis connection
-├── handlers/              # HTTP handlers
-│   ├── auth_handler.go    # Authentication handlers
-│   ├── message_handler.go # Message handlers
-│   ├── ws_handler.go      # WebSocket handlers
-│   └── handler.go         # Main handler
-├── middleware/            # Middleware
-│   └── rate_limit.go      # Rate limiting
-├── models/                # Data models
-│   ├── user.go           # User model
-│   └── message.go        # Message model
-├── services/              # Business logic
-│   ├── user_service.go    # User service
-│   ├── message_service.go # Message service
-│   └── presence_service.go # Presence service
-├── websocket/             # WebSocket implementation
-│   ├── client.go          # WebSocket client
-│   └── hub.go             # WebSocket hub
-└── static/                # Frontend files
-    ├── index.html         # Main HTML
-    ├── style.css          # CSS styles
-    └── app.js             # JavaScript
-```
-
-## 🚀 Deployment
-
-### Docker (Recommended)
-
-Tạo `Dockerfile`:
+### Docker
 ```dockerfile
 FROM golang:1.21-alpine AS builder
 WORKDIR /app
-COPY . .
+COPY go.mod go.sum ./
 RUN go mod download
+COPY . .
 RUN go build -o main .
 
 FROM alpine:latest
 RUN apk --no-cache add ca-certificates
 WORKDIR /root/
 COPY --from=builder /app/main .
-COPY --from=builder /app/static ./static
+COPY --from=builder /app/templates ./templates
 CMD ["./main"]
 ```
 
-Tạo `docker-compose.yml`:
-```yaml
-version: '3.8'
-services:
-  app:
-    build: .
-    ports:
-      - "8080:8080"
-    environment:
-      - DB_HOST=postgres
-      - REDIS_HOST=redis
-    depends_on:
-      - postgres
-      - redis
-
-  postgres:
-    image: postgres:15
-    environment:
-      POSTGRES_DB: chatapp
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 123456
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
-  redis:
-    image: redis:7-alpine
-    volumes:
-      - redis_data:/data
-
-volumes:
-  postgres_data:
-  redis_data:
-```
-
-Chạy với Docker:
+### Environment Variables
 ```bash
-docker-compose up -d
+export PORT=8080
+export REDIS_ADDR=redis:6379
+export REDIS_PASSWORD=your_redis_password
 ```
 
-## 🔒 Security Features
+## Troubleshooting
 
-- **Rate Limiting** - Ngăn chặn spam và DDoS
-- **Input Validation** - Kiểm tra dữ liệu đầu vào
-- **Password Hashing** - Mã hóa mật khẩu với bcrypt
-- **CORS Protection** - Cấu hình CORS phù hợp
-- **Connection Limits** - Giới hạn kết nối WebSocket
+### Redis Connection Issues
+- Kiểm tra Redis có đang chạy không
+- Kiểm tra cấu hình `REDIS_ADDR` và `REDIS_PASSWORD`
+- Ứng dụng vẫn hoạt động nếu không có Redis (không lưu lịch sử)
 
-## 🧪 Testing
+### WebSocket Issues
+- Kiểm tra firewall có chặn WebSocket không
+- Kiểm tra proxy có hỗ trợ WebSocket không
 
-```bash
-# Chạy tests
-go test ./...
+### Rate Limiting
+- Nếu bị giới hạn, chờ trong thời gian window được cấu hình
+- Có thể điều chỉnh rate limits trong `middleware/rate_limiter.go`
 
-# Test coverage
-go test -cover ./...
+## License
 
-# Benchmark tests
-go test -bench=. ./...
-```
-
-## 📈 Monitoring
-
-### Health Check
-```bash
-curl http://localhost:8080/health
-```
-
-### Metrics Endpoints
-- `/health` - Health status
-- `/ping` - Simple ping endpoint
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open Pull Request
-
-## 📝 License
-
-This project is licensed under the MIT License.
-
-## 🆘 Troubleshooting
-
-### Common Issues
-
-1. **Database connection failed**
-   - Kiểm tra PostgreSQL đang chạy
-   - Verify database credentials
-   - Check network connectivity
-
-2. **Redis connection failed**
-   - Kiểm tra Redis đang chạy
-   - Verify Redis configuration
-   - Check firewall settings
-
-3. **WebSocket connection failed**
-   - Kiểm tra port 8080 available
-   - Verify CORS settings
-   - Check browser console for errors
-
-### Logs
-
-```bash
-# View application logs
-tail -f /var/log/chat-app.log
-
-# Docker logs
-docker-compose logs -f app
-```
-
-## 📞 Support
-
-Nếu gặp vấn đề, vui lòng:
-1. Check logs
-2. Verify configuration
-3. Create issue trên GitHub
-4. Contact development team
-
----
-
-**Chúc bạn sử dụng ứng dụng vui vẻ! 🎉**
+MIT License
