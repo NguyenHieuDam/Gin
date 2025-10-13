@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Aggregator - Tổng hợp tin tức</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-newspaper"></i>
+                <h1>News Aggregator</h1>
+            </div>
+            <nav class="nav">
+                <button class="nav-btn active" data-category="all">Tất cả</button>
+                <button class="nav-btn" data-category="technology">Công nghệ</button>
+                <button class="nav-btn" data-category="business">Kinh doanh</button>
+                <button class="nav-btn" data-category="sports">Thể thao</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <div class="controls">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Tìm kiếm tin tức...">
+                </div>
+                <button class="refresh-btn" id="refreshBtn">
+                    <i class="fas fa-sync-alt"></i>
+                    Làm mới
+                </button>
+                <button class="collect-btn" id="collectBtn">
+                    <i class="fas fa-plus"></i>
+                    Thu thập tin tức
+                </button>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <i class="fas fa-newspaper"></i>
+                    <div>
+                        <h3 id="totalArticles">0</h3>
+                        <p>Tổng số bài viết</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-clock"></i>
+                    <div>
+                        <h3 id="lastUpdate">--:--</h3>
+                        <p>Cập nhật cuối</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-server"></i>
+                    <div>
+                        <h3 id="apiStatus">Đang kiểm tra...</h3>
+                        <p>Trạng thái API</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="news-container">
+                <div class="loading" id="loading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Đang tải tin tức...</p>
+                </div>
+                <div class="news-grid" id="newsGrid">
+                    <!-- News articles will be loaded here -->
+                </div>
+                <div class="no-news" id="noNews" style="display: none;">
+                    <i class="fas fa-newspaper"></i>
+                    <h3>Không có tin tức nào</h3>
+                    <p>Hãy thử thu thập tin tức mới hoặc chọn danh mục khác</p>
+                </div>
+            </div>
+
+            <div class="pagination" id="pagination">
+                <button class="page-btn" id="prevBtn" disabled>
+                    <i class="fas fa-chevron-left"></i>
+                    Trước
+                </button>
+                <span class="page-info" id="pageInfo">Trang 1 / 1</span>
+                <button class="page-btn" id="nextBtn" disabled>
+                    Sau
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 News Aggregator. Được xây dựng với Go, Kafka và Redis.</p>
+        </div>
+    </footer>
+
+    <div class="modal" id="articleModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle"></h2>
+                <button class="close-btn" id="closeModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="article-meta">
+                    <span class="source" id="modalSource"></span>
+                    <span class="category" id="modalCategory"></span>
+                    <span class="date" id="modalDate"></span>
+                </div>
+                <div class="article-content" id="modalContent"></div>
+                <div class="article-actions">
+                    <a href="#" id="modalUrl" target="_blank" class="read-more-btn">
+                        <i class="fas fa-external-link-alt"></i>
+                        Đọc bài gốc
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
